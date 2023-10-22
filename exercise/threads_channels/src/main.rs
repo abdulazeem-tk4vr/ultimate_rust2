@@ -85,6 +85,7 @@ fn main() {
     // thread by calling `drop(tx)` (assuming you named your sender channel variable `tx`). Join
     // the child threads.
     let (tx1, rx1) = channel::unbounded();
+    let (tx4, rx4) = channel::unbounded();
     let (tx2, rx2) = channel::unbounded();
 
     let handle_c1 = thread::spawn(move || {
@@ -99,10 +100,17 @@ fn main() {
         }
     });
 
+    let handle_c3 = thread::spawn(move || {
+        for val in rx4 {
+            println!("Child Thread 3: Received {}", val);
+        }
+    });
+
     for i in 1..=5 {
         println!("Main thread: Sending {}", i);
         tx1.send(i).unwrap();
         tx2.send(i * 10).unwrap();
+        tx4.send(i * 100).unwrap();
         sleep_ms(200);
     }
 
